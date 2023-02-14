@@ -6,7 +6,7 @@
 #### Lilly Patty - lpatty@ucdavis.edu 
 #### Young Ha - yhajeong@ucdavis.edu
 
-The topic of our project is preserving recommended nutritional intakes while finding the most optimal cost saving. We will attempt to determine which food has the highest nutritional value with the lowest price by implementing the Stigler diet problem using the simplex algorithm. The question that we want to answer the following: 
+The topic of our project is preserving recommended nutritional intakes while finding the most optimal cost saving. We will attempt to determine which food combinations provide the required nutritional values with the lowest price by implementing using the simplex algorithm. The question that we want to answer the following: 
 
 * Could we apply a methodology between the interactions of food, prices, and nutrition, to find an optimal minimal cost while maintaining nutritional requirements?
 
