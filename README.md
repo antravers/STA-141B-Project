@@ -6,13 +6,13 @@
 #### Lilly Patty - lpatty@ucdavis.edu 
 #### Young Ha - yhajeong@ucdavis.edu
 
-The topic of our project is preserving recommended nutrional intakes while optimally cost saving. We will attempt to determine which food has the highest nutritional value with the lowest price by implementing the Stigler diet problem using the simplex algorithm. The question that we want to answer the following: 
+The topic of our project is preserving recommended nutritional intakes while optimally cost saving. We will attempt to determine which food has the highest nutritional value with the lowest price by implementing the Stigler diet problem using the simplex algorithm. The question that we want to answer the following: 
 
 * Could we apply a methodology between the interactions of food, prices, and nutrition, to find an optimal minimal cost while maintaining nutritional requirements?
 
 George Stigler won the Nobel Prize in Economics in 1982 for trying to answer this question using linear optimization techniques; the solution was named the Stigler Diet. Seven years later George Dantzig came up with the simplex algorithm, which generalized the solutions to a family of linear optimization problems. In this project, we aim to collect the data of food contents, nutritional values, pertaining price, and finally apply the simplex algorithm to find an optimal, Stigler Diet solution. While the Stigler diet is not recommended for its lack of food diversification, it could potentially be used to reduce food cost in specific cases. 
 
-This project is meaningful to everyone because current inflationary food pricing has made it more difficult for people of modest means to acquire food, and in turn, proper nutrition. Therefore it is a priority to find food that has maximum nutritional value for the minimum price.
+Current high inflationary food pricing makes the project meaningful, particularly for people of modest means who face food insecurity. Therefore, it is a priority to find food that contains recomneded nutritional intakes and value for an optimal minimal price.
 
 The data sets will have to come from two places. The first dataset will be the nutritional contents of common food types. The following provided links are places data can be generated from:
 
@@ -42,7 +42,7 @@ The second data set will contain the respective food prices from multiples local
 
 The data above in many ways is either incomplete or will have to be scrapped. While the CPI index data is available and helpful, we are interested in current food prices. The current food price can be calculated from the CPI if the base price is known, in which case elementary algebra can be applied to find the current price.
 
-The project is challenging for three main reasons. First, the data collection must be accomplished through either direct download, APIs, and data scraping. This may be the most challenging part, as  there aren’t good sources to find specific food prices. According to several librarians, it is mostly industry data used by private organizations to track it and sell it. The government either has outdated information on food prices, or no data at all. CPI data is available, and as previously said, the difficulty will be to find base prices in comparison with the base year of the cpi to find the current price.
+The project is challenging for three main reasons. First, the data collection must be accomplished through either direct download, APIs, and data scraping. This may be the most challenging part, as there aren’t good sources to find specific food prices. According to several librarians, it is mostly industry data used by private organizations to track it and sell it. The government either has outdated information on food prices, or no data at all. CPI data is available, and as previously said, the difficulty will be to find base prices in comparison with the base year of the cpi to find the current price.
 
 Second, the data wrangling process needs to be done as well. Merging data from multiple sources, dealing with data gaps, or statistical outliers will have to be properly addressed. Eventually, food price data will have to be combined with their respective nutritional values.
 
