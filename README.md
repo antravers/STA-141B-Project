@@ -12,7 +12,7 @@ The topic of our project is preserving recommended nutritional intakes while opt
 
 George Stigler won the Nobel Prize in Economics in 1982 for trying to answer this question using linear optimization techniques; the solution was named the Stigler Diet. Seven years later George Dantzig came up with the simplex algorithm, which generalized the solutions to a family of linear optimization problems. In this project, we aim to collect the data of food contents, nutritional values, pertaining price, and finally apply the simplex algorithm to find an optimal, Stigler Diet solution. While the Stigler diet is not recommended for its lack of food diversification, it could potentially be used to reduce food cost in specific cases. 
 
-Current high inflationary food pricing makes the project meaningful, particularly for people of modest means who face food insecurity. Therefore, it is a priority to find food that contains recomneded nutritional intakes and value for an optimal minimal price.
+Current high inflationary food pricing makes the project meaningful, particularly for people of modest means who face food insecurity. Therefore, it is a priority to find food that contains recommended nutritional intakes and value for an optimal minimal price.
 
 The data sets will have to come from two places. The first dataset will be the nutritional contents of common food types. The following provided links are places data can be generated from:
 
