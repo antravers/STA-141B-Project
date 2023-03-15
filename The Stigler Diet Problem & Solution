@@ -225,7 +225,13 @@ The mostly empty rows(the files that didn’t have any matches) are eliminated s
 
 -	# Save the filtered rows to a new CSV file
 -	filtered_rows.to_csv('SECONDFINALoutput.csv', index=False)
+
+
+
 Additionally, because the nutritional data is in terms of 100 g per unit food, it needs to be converted either into pounds or ounces:
+
+
+
 -	import pandas as pd
 -	import re
 
