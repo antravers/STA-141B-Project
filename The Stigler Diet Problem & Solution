@@ -1,0 +1,306 @@
+The Stigler Diet problem is a classic optimization problem in linear programming, proposed by George Stigler, whose solution won him the Nobel Economics Prize. 
+The goal of the problem is to find the least expensive combination of foods that meets a given set of nutritional requirements. Stigler used data on food 
+prices and nutritional contents to identify a diet that would minimize the cost while satisfying the recommended daily allowances
+of various foods and respective nutrients. However, it has the following limitations:
+-	Individual nutrient requirements can vary based on factors such as age, gender, activity level, and health status.
+-	It focuses solely on minimizing cost, disregarding factors such as taste, cultural preferences, and individual food aversions (like food allergies).
+-	It does not account for the importance of variety and a balanced diet.
+-	Food prices, availability, and nutritional content may change over time.
+-	It misses other essential nutrients, or non-nutrient factors that contribute to a healthy diet
+
+
+
+To try to solve the Sigler diet problem, our group began datacrapping supermarket website using python libraries, getting the information, formatting 
+the information, and use it to apply linear optimization. Safeway: Dynamic website data scrapped with Selenium and Beautiful Soup:
+
+
+
+-	# #GETTING MEAT-SEAFOOD DATA
+-	# driver.get("https://www.safeway.com/shop/aisles/meat-seafood.3132.html")
+
+-	# # Wait for the dynamically loaded content to load
+-	# time.sleep(5) # This worked well for content, but other content had to be manually           # loaded
+
+-	# # Use Selenium to scroll down the page and load more products
+-	# for i in range(3):
+-	#     driver.execute_script("window.scrollBy(0, 500);")
+-	#     time.sleep(2)
+
+-	# # Get the HTML of the page and parse it with BeautifulSoup
+-	# # KEEP THESE DATA SAVED
+-	# html = driver.page_source
+-	# meat_seafood = BeautifulSoup(html, 'html.parser')
+-	
+-	# # Close the browser window
+-	# driver.quit()
+
+
+
+As previously said, the dynamic website had to sometimes be loaded manually. A solution with Selenium was found:
+
+
+
+# GETTING ALL MEAT AND SEAFOOD
+-	driver = webdriver.Chrome()
+-	driver.get("https://www.safeway.com/shop/search-results.html?q=meat")
+
+-	# Manually scroll down the page to the desired location
+-	input("Scroll down to the desired location on the page, then press Enter to continue...")
+-	
+-	# Get the HTML of the page and parse it with BeautifulSoup
+-	html = driver.page_source
+-	all_meat_seafood = BeautifulSoup(html, 'html.parser')
+
+-	# Close the browser window
+-	driver.quit()
+
+The code allowed for manually loading the website, which in turn allowed to collect all the food data. 
+The product’s name and respective price were found with:
+
+-	products_names = all_meat_seafood.find_all('a', {'data-qa': 'prd-itm-pttl'}, {'class': 'product-title__name'})
+-	products_prices = all_meat_seafood.find_all('div', {'data-qa': 'prd-itm-pprc-qty'}, {'class': 'product-title__name'})
+
+-	all_meat_seafood_names = [name.text for name in products_names]
+-	all_meat_seafood_prices = [name.text for name in products_prices]
+
+-	df_all_meat_seafood = pd.DataFrame({'All Meat & Seafood Names': all_meat_seafood_names, 'All Meat & Seafood Prices': all_meat_seafood_prices})
+-	df_all_meat_seafood
+
+
+
+Some vegetable had pricing porblems, which cause some issues: 
+
+
+
+-	products_names = all_veggies.find_all('a', {'data-qa': 'prd-itm-pttl'}, {'class': 'product-title__name'})
+-	products_prices = all_veggies.find_all('div', {'data-qa': 'prd-itm-pprc-qty'}, {'class': 'product-title__name'})
+
+-	all_veggies_names = [name.text for name in products_names]
+-	all_veggies_prices = [name.text for name in products_prices]
+
+-	# data cleaning via looking for missing price values (see below for the values found and cleaned out (the names that didn’t have prices at the end were causing mismatch, NaN values were     # introduced and discrepancies between food price and name were later eliminated):
+-	# list1 = all_veggies_names
+-	# list2 = all_veggies_prices
+
+-	# if len(list1) < len(list2):
+-	#     list1 += [float('nan')] * (len(list2) - len(list1))
+-	# else:
+-	#     list2 += [float('nan')] * (len(list1) - len(list2))
+
+-	# df = pd.DataFrame({'col1': list1, 'col2': list2})
+
+
+-	# # Set display options to show all rows and columns
+-	# pd.set_option('display.max_rows', None)
+-	# pd.set_option('display.max_columns', None)
+-	# print(df)
+
+-	# cleaning additional data for foods that have fuzzy/no price values
+-	del all_veggies_names[69]
+-	del all_veggies_names[157]
+-	del all_veggies_names[229]
+-	del all_veggies_names[293]
+-	del all_veggies_names[346]
+-	del all_veggies_names[363]
+-	del all_veggies_names[411]
+-	del all_veggies_names[431]
+
+-	df_all_veggies = pd.DataFrame({'All Veggies Names': all_veggies_names, 'All Veggies Prices': all_veggies_prices})
+-	df_all_veggies
+
+
+
+The data was subsequently converted into several cvs files and concatenated into a big cvs file, where the price per mass was calculated:
+
+
+
+# List of CSV files to concatenate
+-	csv_files = ['all_meat_seafood.csv', 'all_yogurt_pudding.csv', 'all_cheese.csv', 'all_milk_cream.csv', 'all_butter_sour_cream.csv', 'all_eggs.csv', 'all_rice.csv', 'all_grains.csv', 'all_stuffing.csv', 'all_pasta.csv', 'all_fruits.csv', 'all_veggies.csv']
+
+-	# List to store DataFrames for each CSV file
+-	dfs = []
+
+-	# Loop through CSV files and read them into a DataFrame, removing headers
+-	for csv_file in csv_files:
+-	df = pd.read_csv(csv_file, usecols=[0, 1], skiprows=[0], header=None)
+-	df.columns = ['Name', 'Price']
+-	dfs.append(df)
+
+-	# Concatenate DataFrames into a single DataFrame
+-	result = pd.concat(dfs)
+
+-	# Save concatenated DataFrame to a new CSV file
+-	result.to_csv('concatenated_file.csv', index=False)
+
+How price per mass was calculated:
+
+-	# read in the csv file
+-	df = pd.read_csv('concatenated_file.csv')
+
+-	# function to extract float from string
+-	def extract_float(text):
+-	try:
+-	return float(re.findall('\d+\.\d+|\d+', text)[0])
+-	except:
+-	return 0
+
+-	# create new column by multiplying values from columns 1 and 2
+-	df['Mass per money'] = df['Name'].apply(lambda x: extract_float(x.split("-")[-1])).astype(float) * df['Price'].apply(extract_float).astype(float)
+
+-	# create fourth column based on 'Mass per money' column criteria
+-	df['Fourth Column'] = df['Mass per money']
+-	df.loc[df['Mass per money'] == 0, 'Fourth Column'] = df['Price'].apply(extract_float).astype(float)
+
+-	# save updated dataframe to a new csv file
+-	df.to_csv('UPDATED_ALL_DATA.csv', index=False)
+
+
+
+Sadly, the safeway nutritional data has to be clicked in to be obtained, and there are over 5k values!. There is an alternative solution. 
+The US department of agriculture has a data dump file “2019-2020 FNDDS At A Glance - FNDDS Nutrient Values” in  https://www.usda.gov/ where 
+the nutritional values of many foods are listed. It would be rather obvious that the names of foods will have to match with one another. 
+The solution is implementing he Levenshtein Distance. It is also known as the "Edit Distance”, which measures the similarity between two 
+strings. It is defined as the minimum number of single-character edits (insertions, deletions, or substitutions) required to transform one 
+string into another. It is used in natural language processing and computational biology to compare sequences and their similarities. 
+The goal, then will be to pair the most similar strings with the nutritional values:
+
+
+
+-	import pandas as pd
+-	import Levenshtein
+-	#  Using the python-Levenshtein library to calculate the Levenshtein distance.
+
+-	# Read CSV files
+-	file_F = pd.read_csv('ALL_FOOD_PRICE.csv')
+-	file_N = pd.read_csv('stigler nutrional values.csv')
+
+-	# This code will read the CSV files, compare names using the Levenshtein distance,
+-	# Function to find the most similar name
+-	def find_most_similar_name(name_N, names_F, matched_names):
+-	best_match = None
+-	best_match_index = None
+-	min_distance = float('inf')
+
+-	for index, name_F in enumerate(names_F):
+-	if index not in matched_names:
+-	distance = Levenshtein.distance(name_N, name_F)
+
+-	if distance < min_distance:
+o	min_distance = distance
+o	best_match = name_F
+o	best_match_index = index
+
+-	return best_match, best_match_index
+
+-	# Set to keep track of matched names
+-	# keep track of the names that have already been matched in file
+-	# ensure that a name is not matched more than once.
+
+-	matched_names = set()
+
+-	# Iterate through each row in file_N
+-	# If a name in file N has a closer match to a name that has already been matched in file F, 
+-	# it will skip that name and find the next most similar name in file F that hasn't been matched yet.
+-	for index, row in file_N.iterrows():
+-	name_N = row['Main food description']
+-	most_similar_name_F, most_similar_name_index = find_most_similar_name(name_N, file_F.iloc[:, 0], matched_names)
+
+-	# Update matched_names set
+-	matched_names.add(most_similar_name_F)
+
+-	# Append values from file_N to the corresponding row in file_F
+-	for col in file_N.columns[1:]:
+-	file_F.loc[file_F.iloc[:, 0] == most_similar_name_F, col] = row[col]
+
+-	# Save the updated file_F to a new CSV file
+-	file_F.to_csv('FINALoutput.csv', index=False)
+
+
+The mostly empty rows(the files that didn’t have any matches) are eliminated since we don’t gave nutritional values for them.
+
+
+-	# Keep rows with values in all specified columns
+-	specified_columns = list(file_N.columns[1:])
+-	filtered_rows = file_F.dropna(subset=specified_columns)
+
+-	# Save the filtered rows to a new CSV file
+-	filtered_rows.to_csv('SECONDFINALoutput.csv', index=False)
+Additionally, because the nutritional data is in terms of 100 g per unit food, it needs to be converted either into pounds or ounces:
+-	import pandas as pd
+-	import re
+
+-	def extract_float(text):
+-	try:
+-	return float(re.findall('\d+\.\d+|\d+', text)[0])
+-	except:
+-	return 0
+
+-	# Read the CSV file
+-	df = pd.read_csv('SECONDFINALoutput.csv')
+
+-	# Iterate through each row in the DataFrame
+-	for index, row in df.iterrows():
+-	name = row['Name']
+-	splitted_name = name.split('-')
+-	if len(splitted_name) > 1:
+-	multiplier = extract_float(splitted_name[-1])
+
+-	if 'L' in splitted_name[-1].upper():
+-	multiplier *= 0.220462
+-	elif 'O' in splitted_name[-1].upper():
+-	multiplier *= 3.5274
+
+-	# Multiply the values in the rest of the columns by the multiplier
+-	for col in df.columns[2:]:
+-	df.at[index, col] = df.at[index, col] * multiplier
+
+-	# Save the updated DataFrame to a new CSV file
+-	df.to_csv('THIRDFINALoutput.csv', index=False)
+
+
+Now we can use linear optimization to find the stigler diet. Sadly, after many trials, we couldn’t come with a linear optimization alrogithm. 
+Thankfully, the scipy library has one to finish our project.
+
+
+-	import numpy as np
+-	import pandas as pd
+-	from scipy.optimize import linprog
+
+-	# Read the CSV file
+-	df = pd.read_csv('THIRDFINALoutput.csv')
+
+-	# Extract the objective function coefficients (, the second column named 'Fourth Column', has the #corresponding food prices)
+-	c = df['Fourth Column'].values
+
+-	# Extract the constraint matrix (nutritional contents: 'Energy (kcal)', 'Protein (g)',
+-	# 'Fatty acids, total monounsaturated and polyunsaturated (good fats) (g)',
+-	# 'Carbohydrate (g)', 'Fiber, total dietary (g)',
+-	# 'Vitamin A, RAE (mcg_RAE)', 'Vitamin C (mg)', 'Calcium (mg)',
+-	# 'Iron\n(mg)', 'Vitamin D (D2 + D3) (mcg)',
+-	# 'Vitamin E (alpha-tocopherol)  and added (mg)', 'Folate, total (mcg)',
+-	# 'Vitamin B-12, added\n(mcg)')
+-	A_eq = df.iloc[:, 2:].values.T
+
+-	# Flip the signs of the inequalities to use less-than-or-equal-to constraints
+-	A_ineq = -1 * A_eq
+
+-	# Constraint bounds (times 7 because we are looking at weekly compsuption, since going every #day to the store is time consuming, and buying in bulk may be cheaper)
+-	# I took the upper bound of the minimun requirements for an adult male who is very physically active
+-	b_ineq = np.array([-3000*7, -56*7, -0.2 * 3000*7, -0.45 * 3000*7, -38*7, -700*7, -75*7, -1000*7, -8*7, -600*7, -15*7, -400*7, -2.4*7])
+
+-	# Solve the problem
+-	res = linprog(c, A_ub=A_ineq, b_ub=b_ineq)
+
+-	# Print the results
+-	np.set_printoptions(threshold=np.inf)
+-	# print("Optimal solution (Food quantities):", res.x)
+-	print("Minimum cost of the diet:", res.fun)
+
+-	# Print the food names, their corresponding non-zero quantities, and their prices
+-	food_names = df['Name'].values
+-	food_prices = df['Fourth Column'].values
+-	optimal_quantities = res.x
+
+-	for name, price, quantity in zip(food_names, food_prices, optimal_quantities):
+-	if quantity > 1e-6:  # A small threshold to account for floating-point errors
+-	print(f"{name}: {quantity}, Price: {price}")
