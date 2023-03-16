@@ -47,3 +47,11 @@ The project is challenging for three main reasons. First, the data collection mu
 Second, the data wrangling process needs to be done as well. Merging data from multiple sources, dealing with data gaps, or statistical outliers will have to be properly addressed. Eventually, food price data will have to be combined with their respective nutritional values.
 
 Third, the actual application of the simplex algorithm. Thankfully there are several books and resources online about the implementation of the simplex algorithm. To complete this project we will rely heavily on the skills learned from STA 141B , such as web scraping. We will use Python, Jupyter Notebook or Google Colab. We will also use Matplotlib to show static visualization and use web APIs to gather the data we are going to use.
+
+# Summarizing tasks
+
+Using Python’s Requests module and Pandas’ table scraping function we were able to scrape the contents of a table containing Trader Joe’s food prices, updated within the current month,  from a grocery blog website. The table included the product’s price, brand, size and price per unit. The list of 170 food products was varied in kind, from food products unique to Trader Joes to general dairy and produce items. Having formatted the table into a Pandas data frame we were able to use functions within Pandas to clean up the data. Such as dropping information irrelevant to the project’s goal; such as NA values, the column with the products’ brand and non-food items. Functions within Pandas were also used to merge the Trader Joe's price dataframe with that of the item's nutritional values. Further routine cleaning of the data frames were required before and after the merge. For example making it so that the rows were equivalent for both data frames by diligently looking through the data and deleting duplicate or missing items. Nutritional values that were imputed as Daily Value percentages were converted to mg or mcg units of measure. 
+We solved the Stigler’s diet problem by using scipy’s optimization and tools within numpy to format the data into arrays. 
+
+
+
